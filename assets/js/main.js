@@ -47,13 +47,14 @@ document.getElementById('input_file').addEventListener("change", (event) => {
     const file = event.target.files[0];
     if(file){
         clearLabels();
+        document.getElementById('input_file_label').innerText = "Converting...";
         let fileReader = new FileReader();
         fileReader.readAsBinaryString(file);
-        fileReader.onload = (event) => {
+        fileReader.onload = async (event) => {
             let data = event.target.result;
-            let workbook = XLSX.read(data, { type:"binary" });
-            workbook.SheetNames.forEach((sheet) => {
-                let rowObject = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheet]);
+            let workbook = await XLSX.read(data, { type:"binary" });
+            await workbook.SheetNames.forEach(async (sheet) => {
+                let rowObject = await XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheet]);
                 rowObject.forEach((element) => {
                     const id = labels.length;
                     new Label(id, element["ANC"], element["BIN"], element["QUANTITY"]);
@@ -89,7 +90,7 @@ async function generateQRCodes () {
             text: label.quantity
         });
     }
-
+    document.getElementById('input_file_label').innerText = "The document has been successfully converted.";
     readyToPrint();
 }
 
@@ -99,7 +100,7 @@ function print () {
     mywindow.document.write(`
         <html>
             <head>
-                <title>OnFloor Label</title>
+                <title>Transfer Order Labels</title>
                 <link rel="stylesheet" href="./assets/css/label.css">
             </head>
             <body>`);
@@ -123,6 +124,7 @@ function refreshApp () {
     labels = [];
     document.getElementById('input_file').value = '';
     document.getElementById('button_print').hidden = true;
+    document.getElementById('input_file_label').innerText = "Click to select a document.";
 }
 
 function readyToPrint () {
