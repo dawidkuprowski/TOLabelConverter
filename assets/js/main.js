@@ -69,21 +69,21 @@ function clearLabels () {
     labelsContainer.innerHTML = '';
 }
 
-function generateQRCodes () {
-    for (label of labels) {
-        var qrANC = new QRCode(document.getElementById("qrANC_" + label.id), {
+async function generateQRCodes () {
+    for await (label of labels) {
+        var qrANC = await new QRCode(document.getElementById("qrANC_" + label.id), {
             width: 128,
             height: 128,
             text: label.anc
         });
     
-        var qrBIN = new QRCode(document.getElementById("qrBIN_" + label.id), {
+        var qrBIN = await new QRCode(document.getElementById("qrBIN_" + label.id), {
             width: 128,
             height: 128,
             text: label.bin
         });
     
-        var qrQUANT = new QRCode(document.getElementById("qrQUANTITY_" + label.id), {
+        var qrQUANT = await new QRCode(document.getElementById("qrQUANTITY_" + label.id), {
             width: 128,
             height: 128,
             text: label.quantity
@@ -115,6 +115,10 @@ function print () {
         </html>
     `);
 
+    refreshApp();
+}
+
+function refreshApp () {
     clearLabels();
     labels = [];
     document.getElementById('input_file').value = '';
