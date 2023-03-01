@@ -135,7 +135,7 @@ document.getElementById('input_file').addEventListener("change", (_event) => {
     const files = _event.target.files;
     if (files.length > 0) clearLabels();
     for (let i = 0; i < files.length; i++) {
-        document.getElementById('input_file_label').innerText = "Converting...";
+        document.getElementById('input_file_label').innerText = "Konwertowanie...";
         let fileReader = new FileReader();
         fileReader.readAsBinaryString(files[i]);
         fileReader.onload = async (event) => {
@@ -207,7 +207,7 @@ async function generateQRCodes () {
             text: label.tr_order + label.tr_item
         });
     }
-    document.getElementById('input_file_label').innerText = "The document has been successfully converted.";
+    document.getElementById('input_file_label').innerText = 'Dokumenty zostały pomyślnie skonwertowane.\nWejdź w podgląd i użyj kombinacji przycisków \n"Ctrl + P" aby wydrukować etykiety.';
     readyToPrint();
 }
 
@@ -241,8 +241,10 @@ function refreshApp () {
     labels = [];
     document.getElementById('input_file').value = '';
     document.getElementById('button_print').hidden = true;
-    document.getElementById('input_file_label').innerText = "Click to select a document.";
+    document.getElementById('input_file_label').innerText = "Kliknij aby przesłać dokumenty.";
 }
+
+refreshApp();
 
 function readyToPrint () {
     document.getElementById('button_print').hidden = false;
