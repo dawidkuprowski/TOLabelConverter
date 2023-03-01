@@ -3,9 +3,10 @@ let labels = [];
 const qrCodeSize = 128;
 
 class Label {
-    constructor (id, date, anc, qty, from_st, from_bin, to_st, to_bin, tr_order, tr_item) {
+    constructor (id, date, time, anc, qty, from_st, from_bin, to_st, to_bin, tr_order, tr_item, material_description, user, unit) {
         this.id = id;
         this.date = date;
+        this.time = time;
         this.anc = anc;
         this.qty = qty;
         this.from_st = from_st;
@@ -14,17 +15,35 @@ class Label {
         this.to_bin = to_bin;
         this.tr_order = tr_order;
         this.tr_item = tr_item;
-
+        this.material_description = material_description;
+        this.user = user;
+        this.unit = unit;
+        
         this.init();
     }
-
+    
     init () {
         labelsContainer.innerHTML += `
         <div class="label_container">
             <div class="row">
-                <div class="col flex-100">
+                <div class="col">
                     <div class="col p0">
-                        <span class="fs-2 fw-5">${this.date}</span>
+                        <span class="fs-2 fw-5 text-center">${this.date}</span>
+                    </div>
+                    <div class="col p0">
+                        <span class="fs-2 fw-5 text-center">${this.time}</span>
+                    </div>
+                </div>
+                <div class="border_col"></div>
+                <div class="col flex-100 gap-1">
+                    <div class="col p0">
+                        <span class="fs-2 fw-7 text-center">${this.material_description}</span>
+                    </div>
+                </div>
+                <div class="border_col"></div>
+                <div class="col">
+                    <div class="col p0">
+                        <span class="fs-2 fw-5 text-center">${this.user}</span>
                     </div>
                 </div>
             </div>
@@ -35,17 +54,17 @@ class Label {
                         <span class="fs-4 fw-5">ANC</span>
                     </div>
                     <div class="col p0">
-                        <span class="fs-7 fw-7">${this.anc}</span>
+                        <span class="fs-6 fw-7 text-center">${this.anc}</span>
                     </div>
                 </div>
                 <div class="border_col"></div>
-                <div class="col p1" id="qrANC_${this.id}">
+                <div class="col p05" id="qrANC_${this.id}">
                     
                 </div>
             </div>
             <div class="border_row"></div>
             <div class="row">
-                <div class="col p1" id="qrQTY_${this.id}">
+                <div class="col p05" id="qrQTY_${this.id}">
                     
                 </div>
                 <div class="border_col"></div>
@@ -54,7 +73,7 @@ class Label {
                         <span class="fs-4 fw-5">QTY</span>
                     </div>
                     <div class="col p0">
-                        <span class="fs-7 fw-7">${this.qty}</span>
+                        <span class="fs-7 fw-7 text-center">${this.qty} ${this.unit}</span>
                     </div>
                 </div>
                 <div class="border_col"></div>
@@ -63,10 +82,10 @@ class Label {
                         <span class="fs-4 fw-5">FROM</span>
                     </div>
                     <div class="col p0">
-                        <span class="fs-4 fw-7">${this.from_st}</span>
+                        <span class="fs-4 fw-7 text-center">${this.from_st}</span>
                     </div>
                     <div class="col p0">
-                        <span class="fs-4 fw-5">${this.from_bin}</span>
+                        <span class="fs-4 fw-5 text-center">${this.from_bin}</span>
                     </div>
                 </div>
             </div>
@@ -77,22 +96,22 @@ class Label {
                         <span class="fs-4 fw-5">TO</span>
                     </div>
                     <div class="col p0">
-                        <span class="fs-4 fw-7">${this.to_st}</span>
+                        <span class="fs-4 fw-7 text-center">${this.to_st}</span>
                     </div>
                 </div>
                 <div class="col flex-100">
                     <div class="col p0">
-                        <span class="fs-11 fw-7">${this.to_bin}</span>
+                        <span class="fs-11 fw-7 text-center">${this.to_bin}</span>
                     </div>
                 </div>
                 <div class="border_col"></div>
-                <div class="col p1" id="qrTO_BIN_${this.id}">
+                <div class="col p05" id="qrTO_BIN_${this.id}">
                         
                 </div>
             </div>
             <div class="border_row"></div>
             <div class="row">
-                <div class="col p1" id="qrTR_ORDER_ITEM_${this.id}">
+                <div class="col p05" id="qrTR_ORDER_ITEM_${this.id}">
                             
                 </div>
                 <div class="border_col"></div>
@@ -101,7 +120,7 @@ class Label {
                         <span class="fs-4 fw-5">TR.ORDER / ITEM</span>
                     </div>
                     <div class="col p0">
-                        <span class="fs-6 fw-7">${this.tr_order} / ${this.tr_item}</span>
+                        <span class="fs-6 fw-7 text-center">${this.tr_order} / ${this.tr_item}</span>
                     </div>
                 </div>
             </div>
@@ -112,34 +131,44 @@ class Label {
     }
 }
 
-document.getElementById('input_file').addEventListener("change", (event) => {
-    const file = event.target.files[0];
-    if(file){
-        clearLabels();
+document.getElementById('input_file').addEventListener("change", (_event) => {
+    const files = _event.target.files;
+    if (files.length > 0) clearLabels();
+    for (let i = 0; i < files.length; i++) {
         document.getElementById('input_file_label').innerText = "Converting...";
         let fileReader = new FileReader();
-        fileReader.readAsBinaryString(file);
+        fileReader.readAsBinaryString(files[i]);
         fileReader.onload = async (event) => {
             let data = event.target.result;
             let workbook = await XLSX.read(data, { type:"binary" });
             await workbook.SheetNames.forEach(async (sheet) => {
                 let rowObject = await XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheet]);
-                console.log(rowObject);
-                for (let i = 1; i < rowObject.length; i++) {
+                console.log(rowObject)
+                for (let i = 0; i < rowObject.length; i++) {
                     const id = labels.length;
-                    let _date = rowObject[i]["__EMPTY"];
-                    let _anc = rowObject[i]["__EMPTY_3"];
-                    let _qty = rowObject[i]["__EMPTY_8"].toFixed(3);
-                    let _from_st = rowObject[i]["__EMPTY_4"];
-                    let _from_bin = rowObject[i]["__EMPTY_5"];
-                    let _to_st = rowObject[i]["__EMPTY_6"];
-                    let _to_bin = rowObject[i]["__EMPTY_7"].toString().padStart(8, '0').replace(/\d{2}(?!$)/g, "$&-");
-                    let _tr_order = rowObject[i]["__EMPTY_1"].toString().padStart(10, '0');
-                    let _tr_item = rowObject[i]["__EMPTY_2"].toString().padStart(4, '0');
+                    let _date = new Date((Number(rowObject[i]["Creation Date"]) - 25569) * 86400 * 1000).toLocaleDateString();
+                    let _time = Number(rowObject[i]["Creation time"]);
+                    const hour = _time * 24;
+                    const roundedHour = Math.floor(hour);
+                    const minute = Math.floor((hour - roundedHour) * 60);
+                    const second = Math.floor((((hour - roundedHour) * 60) - minute) * 60);
+                    const formatedTime = `${String(roundedHour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')}`;
+                    let _anc = rowObject[i]["Material"].toString();
+                    let _qty = rowObject[i]["Source target qty"].toString();
+                    let _from_st = rowObject[i]["Source Storage Type"].toString();
+                    let _from_bin = rowObject[i]["Source Storage Bin"].toString();
+                    let _to_st = rowObject[i]["Dest. Storage Type"].toString();
+                    let _to_bin = rowObject[i]["Dest.Storage Bin"].toString().padStart(8, '0').replace(/\d{2}(?!$)/g, "$& ");
+                    let _tr_order = rowObject[i]["Transfer Order Number"].toString().padStart(10, '0');
+                    let _tr_item = rowObject[i]["Transfer order item"].toString().padStart(4, '0');
+                    let _material_description = rowObject[i]["Material Description"].toString();
+                    let _user = rowObject[i]["User"].toString();
+                    let _unit = rowObject[i]["Alternative Unit of Measure"].toString();
+
                     if (_anc.length > 9) {
                         _anc = _anc.substr(_anc.length - 9);
                     }
-                    new Label(id, _date, _anc, _qty, _from_st, _from_bin, _to_st, _to_bin, _tr_order, _tr_item);
+                    new Label(id, _date, formatedTime, _anc, _qty, _from_st, _from_bin, _to_st, _to_bin, _tr_order, _tr_item, _material_description, _user, _unit);
                 }
             });
 

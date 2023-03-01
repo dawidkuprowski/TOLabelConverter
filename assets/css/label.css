@@ -3,6 +3,7 @@
     padding: 0;
     box-sizing: border-box;
     font-family: sans-serif;
+    word-break: break-all;
 }
 
 .label_container {
@@ -12,6 +13,7 @@
 
     display: flex;
     flex-flow: column;
+    overflow: hidden;
 }
 
 .row {
@@ -75,7 +77,16 @@
 
 .p0 { padding: 0; }
 .p1 { padding: 1vw; }
+.p05 { padding: 0.5vw; }
+
+.text-center {
+    text-align: center;
+}
 
 img {
-    width: 12vw;
+    width: 13vw;
+}
+
+canvas {
+    display: none;
 }
