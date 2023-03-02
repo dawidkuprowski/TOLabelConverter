@@ -185,7 +185,7 @@ document.getElementById('input_file').addEventListener("change", (_event) => {
                 }
             });
 
-            generateQRCodes();
+            generateQRCodes(i === files.length - 1);
             document.getElementById('input_file_button').hidden = true;
             document.getElementById('input_file_button').parentElement.hidden = true;
         }
@@ -196,7 +196,7 @@ function clearLabels () {
     labelsContainer.innerHTML = '';
 }
 
-async function generateQRCodes () {
+async function generateQRCodes (last) {
     for await (label of labels) {
         var qrANC = await new QRCode(document.getElementById("qrANC_" + label.id), {
             width: 96,
@@ -222,10 +222,13 @@ async function generateQRCodes () {
             text: label.tr_order + label.tr_item
         });
     }
-    endTime = Date.now();
-    document.getElementById('input_file_label').innerText = `Dokumenty zostały pomyślnie skonwertowane.\nWejdź w podgląd i użyj kombinacji przycisków \n"Ctrl + P" aby wydrukować etykiety.
-    \nWygenerowano w ${((endTime - startTime) / 1000).toFixed(2)}s.`;
-    readyToPrint();
+    
+    if (last) {
+        endTime = Date.now();
+        document.getElementById('input_file_label').innerText = `Dokumenty zostały pomyślnie skonwertowane.\nWejdź w podgląd i użyj kombinacji przycisków \n"Ctrl + P" aby wydrukować etykiety.
+        \nWygenerowano w ${((endTime - startTime) / 1000).toFixed(2)}s.`;
+        readyToPrint();
+    }
 }
 
 function print () {
