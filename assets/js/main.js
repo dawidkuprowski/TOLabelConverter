@@ -149,8 +149,10 @@ class Label {
 document.getElementById('input_file').addEventListener("change", (_event) => {
     startTime = Date.now();
     const files = _event.target.files;
-    if (files.length > 0)
+    if (files.length > 0) {
         clearLabels();
+        document.getElementById('spinner').hidden = false;
+    }
 
     for (let i = 0; i < files.length; i++) {
         document.getElementById('input_file_label').innerText = "Generuje etykiety...";
@@ -228,6 +230,7 @@ async function generateQRCodes (last) {
         document.getElementById('input_file_label').innerText = `Dokumenty zostały pomyślnie skonwertowane.\nWejdź w podgląd i użyj kombinacji przycisków \n"Ctrl + P" aby wydrukować etykiety.
         \nWygenerowano w ${((endTime - startTime) / 1000).toFixed(2)}s.`;
         readyToPrint();
+        document.getElementById('spinner').hidden = true;
     }
 }
 
