@@ -2,9 +2,6 @@ const labelsContainer = document.getElementById('labels');
 let labels = [];
 const qrCodeSize = 128;
 
-let startTime = Date.now();
-let endTime = Date.now();
-
 class Label {
     constructor (id, date, time, anc, qty, from_st, from_bin, to_st, to_bin, tr_order, tr_item, material_description, user, unit) {
         this.id = id;
@@ -91,7 +88,7 @@ class Label {
                         <span class="fs-3 fw-5">QTY</span>
                     </div>
                     <div class="col p0">
-                        <span class="fs-7 fw-7 text-center">${this.qty} ${this.unit}</span>
+                        <span class="fs-9 fw-7 text-center">${this.qty} ${this.unit}</span>
                     </div>
                 </div>
             </div>
@@ -147,7 +144,6 @@ class Label {
 }
 
 document.getElementById('input_file').addEventListener("change", (_event) => {
-    startTime = Date.now();
     const files = _event.target.files;
     if (files.length > 0)
         clearLabels();
@@ -265,8 +261,6 @@ function refreshApp () {
 refreshApp();
 
 function readyToPrint () {
-    endTime = Date.now();
-    document.getElementById('input_file_label').innerText = `Dokumenty zostały pomyślnie skonwertowane.\nWejdź w podgląd i użyj kombinacji przycisków \n"Ctrl + P" aby wydrukować etykiety.
-    \nWygenerowano w ${((endTime - startTime) / 1000).toFixed(2)}s.`;
+    document.getElementById('input_file_label').innerText = `Dokumenty zostały pomyślnie skonwertowane.\nWejdź w podgląd i użyj kombinacji przycisków \n"Ctrl + P" aby wydrukować etykiety.`;
     document.getElementById('button_print').hidden = false;
 }
