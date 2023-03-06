@@ -149,10 +149,8 @@ class Label {
 document.getElementById('input_file').addEventListener("change", (_event) => {
     startTime = Date.now();
     const files = _event.target.files;
-    if (files.length > 0) {
+    if (files.length > 0)
         clearLabels();
-        document.getElementById('spinner').hidden = false;
-    }
 
     for (let i = 0; i < files.length; i++) {
         document.getElementById('input_file_label').innerText = "Generuje etykiety...";
@@ -163,7 +161,7 @@ document.getElementById('input_file').addEventListener("change", (_event) => {
             let workbook = await XLSX.read(data, { type:"binary" });
             await workbook.SheetNames.forEach(async (sheet) => {
                 let rowObject = await XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheet]);
-                console.log(rowObject)
+                console.log(rowObject);
                 for (let i = 0; i < rowObject.length; i++) {
                     const id = labels.length;
                     let _date = Number(rowObject[i]["Creation Date"]);
@@ -225,13 +223,8 @@ async function generateQRCodes (last) {
         });
     }
     
-    if (last) {
-        endTime = Date.now();
-        document.getElementById('input_file_label').innerText = `Dokumenty zostały pomyślnie skonwertowane.\nWejdź w podgląd i użyj kombinacji przycisków \n"Ctrl + P" aby wydrukować etykiety.
-        \nWygenerowano w ${((endTime - startTime) / 1000).toFixed(2)}s.`;
+    if (last)
         readyToPrint();
-        document.getElementById('spinner').hidden = true;
-    }
 }
 
 function print () {
@@ -272,5 +265,8 @@ function refreshApp () {
 refreshApp();
 
 function readyToPrint () {
+    endTime = Date.now();
+    document.getElementById('input_file_label').innerText = `Dokumenty zostały pomyślnie skonwertowane.\nWejdź w podgląd i użyj kombinacji przycisków \n"Ctrl + P" aby wydrukować etykiety.
+    \nWygenerowano w ${((endTime - startTime) / 1000).toFixed(2)}s.`;
     document.getElementById('button_print').hidden = false;
 }
